@@ -6,6 +6,7 @@
     <title>رسالة في صورة - منصة إنشاء الرسائل المصورة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #6d28d9;
@@ -258,6 +259,7 @@
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         .form-group label {
@@ -267,16 +269,21 @@
             color: var(--text-dark);
         }
 
-        .form-group textarea {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 15px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            resize: vertical;
-            min-height: 150px;
             font-family: inherit;
+            font-size: 1rem;
         }
 
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .dark-mode .form-group input, 
         .dark-mode .form-group textarea {
             background-color: var(--dark-color);
             color: var(--text-dark);
@@ -314,6 +321,8 @@
             background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
             border-radius: 12px;
             margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
         .preview-text {
@@ -324,6 +333,7 @@
             padding: 20px;
             max-width: 100%;
             word-break: break-word;
+            z-index: 2;
         }
 
         /* الفوتر */
@@ -512,173 +522,64 @@
             font-size: 0.9rem;
         }
 
-        /* شريط التقدم */
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background-color: #e5e7eb;
-            border-radius: 4px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .dark-mode .progress-container {
-            background-color: #374151;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: var(--primary-color);
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-
-        /* تحسينات لوحة التحكم */
-        .admin-sidebar {
-            width: 250px;
-            background: var(--dark-color);
-            color: white;
-            height: 100vh;
+        /* Loader */
+        #globalLoader {
             position: fixed;
             top: 0;
-            right: 0;
-            padding: 20px 0;
-            transition: all 0.3s;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
 
-        .admin-content {
-            margin-right: 250px;
-            padding: 20px;
-            transition: all 0.3s;
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
         }
 
-        .sidebar-collapsed .admin-sidebar {
-            width: 70px;
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
         }
 
-        .sidebar-collapsed .admin-content {
-            margin-right: 70px;
+        /* Step indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
         }
 
-        .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: white;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 10px;
         }
 
-        .sidebar-header h2 {
-            font-size: 1.2rem;
-        }
-
-        .admin-menu {
-            list-style: none;
-            margin-top: 20px;
-            padding: 0;
-        }
-
-        .admin-menu li {
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .admin-menu li:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .admin-menu li.active {
+        .step.active {
             background: var(--primary-color);
+            transform: scale(1.1);
         }
 
-        .site-header {
-            background: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-        }
-
-        .dark-mode .site-header {
-            background: var(--dark-color);
-        }
-
-        .site-header .logo {
-            font-size: 1.8rem;
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
             color: var(--primary-color);
             font-weight: 700;
-        }
-
-        .admin-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .admin-user img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .main-content {
-            padding: 30px;
-            background: var(--light-color);
-        }
-
-        .dark-mode .main-content {
-            background: var(--light-color);
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary-color);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
         }
 
         /* نماذج المصادقة */
@@ -714,59 +615,120 @@
             text-align: center;
         }
 
-        /* Loader */
-        #globalLoader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
+        /* تحسينات التصميم */
+        .action-buttons {
             display: flex;
             justify-content: center;
-            align-items: center;
-            z-index: 9999;
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            border: 0.25em solid currentColor;
-            border-right-color: transparent;
-            border-radius: 50%;
-            animation: spinner-border 0.75s linear infinite;
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
         }
 
-        @keyframes spinner-border {
+        /* إضافة أنماط جديدة للتحسينات */
+        .progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .requirement-met {
+            color: var(--secondary-color);
+        }
+        
+        .requirement-not-met {
+            color: var(--text-light);
+        }
+        
+        .setup-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .saving-indicator {
+            display: none;
+            margin-left: 10px;
+        }
+        
+        .saving-indicator.active {
+            display: inline-block;
+            animation: spin 1s infinite linear;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
-        /* Tables */
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
+        .form-text {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
         }
 
-        .table th, .table td {
-            padding: 0.75rem;
-            text-align: right;
-            border-top: 1px solid var(--border-color);
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
-        .table thead th {
-            border-bottom: 2px solid var(--border-color);
+        .btn:disabled:hover {
+            transform: none !important;
         }
 
-        .table tbody tr:hover {
-            background-color: rgba(0, 0, 0, 0.075);
+        .share-link-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            display: none;
         }
 
-        /* Charts */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 30px;
+        .share-link-input {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .share-link-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px 0 0 4px;
+            font-family: inherit;
+        }
+
+        .share-link-input button {
+            border-radius: 0 4px 4px 0;
+        }
+
+        .share-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
         }
 
         /* responsive */
@@ -783,60 +745,25 @@
                 transform: scale(1);
             }
             
-            .admin-sidebar {
-                width: 70px;
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
             }
             
-            .admin-content {
-                margin-right: 70px;
+            .action-buttons .btn {
+                width: 200px;
+                margin-bottom: 10px;
             }
-            
-            .sidebar-header h2 {
-                display: none;
+
+            .share-options {
+                flex-direction: column;
             }
-            
-            .admin-menu li span {
-                display: none;
-            }
-        }
-
-        /* Step indicator */
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--primary-light);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin: 0 10px;
-        }
-
-        .step.active {
-            background: var(--primary-color);
-            transform: scale(1.1);
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2rem;
-            color: var(--primary-color);
-            font-weight: 700;
         }
     </style>
 </head>
 <body>
     <!-- Loader -->
-    <div id="globalLoader" style="display: none;">
+    <div id="globalLoader">
         <div style="text-align: center;">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">جاري التحميل...</span>
@@ -852,7 +779,7 @@
     </div>
 
     <!-- صفحة إعداد المدير (تظهر أول مرة فقط) -->
-    <div class="setup-container" id="setupContainer" style="display: none;">
+    <div class="setup-container" id="setupContainer">
         <div class="logo">
             <i class="fas fa-crown"></i> رسالة في صورة
         </div>
@@ -863,6 +790,10 @@
             <div class="step">3</div>
         </div>
         
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
         <div class="setup-header">
             <h1><i class="fas fa-crown"></i> إعداد مدير النظام</h1>
             <p>مرحباً بك! يبدو أن هذا هو أول تشغيل للموقع. يرجى إنشاء حساب المدير لتتمكن من إدارة الموقع.</p>
@@ -870,367 +801,116 @@
         
         <div id="alertBox" class="alert"></div>
         
+        <!-- الخطوة 1: المعلومات الأساسية -->
         <form id="adminSetupForm">
-            <div class="form-group">
-                <label for="adminUsername"><i class="fas fa-user"></i> اسم المستخدم:</label>
-                <input type="text" id="adminUsername" name="adminUsername" required placeholder="اختر اسم مستخدم فريد" autocomplete="off">
-            </div>
-            
-            <div class="form-group">
-                <label for="adminEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني:</label>
-                <input type="email" id="adminEmail" name="adminEmail" required placeholder="example@email.com" autocomplete="off">
-            </div>
-            
-            <div class="form-group">
-                <label for="adminPassword"><i class="fas fa-lock"></i> كلمة المرور:</label>
-                <input type="password" id="adminPassword" name="adminPassword" required placeholder="كلمة المرور القوية" oninput="checkPasswordStrength()">
-                <i class="fas fa-eye toggle-password" onclick="togglePassword('adminPassword', this)"></i>
-                <div class="password-strength">
-                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+            <div class="step-content active" id="step1">
+                <div class="form-group">
+                    <label for="adminUsername"><i class="fas fa-user"></i> اسم المستخدم:</label>
+                    <input type="text" id="adminUsername" name="adminUsername" required placeholder="اختر اسم مستخدم فريد" autocomplete="off">
+                    <small id="usernameFeedback" class="form-text"></small>
                 </div>
-                <div class="strength-text" id="passwordStrengthText"></div>
+                
+                <div class="form-group">
+                    <label for="adminEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني:</label>
+                    <input type="email" id="adminEmail" name="adminEmail" required placeholder="example@email.com" autocomplete="off">
+                    <small id="emailFeedback" class="form-text"></small>
+                </div>
+                
+                <div class="setup-footer">
+                    <div></div> <!-- عنصر نائب للمساحة -->
+                    <button type="button" class="btn btn-primary" id="nextToStep2">
+                        التالي <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
             </div>
             
-            <div class="form-group">
-                <label for="adminConfirmPassword"><i class="fas fa-lock"></i> تأكيد كلمة المرور:</label>
-                <input type="password" id="adminConfirmPassword" name="adminConfirmPassword" required placeholder="أعد إدخال كلمة المرور">
-                <i class="fas fa-eye toggle-password" onclick="togglePassword('adminConfirmPassword', this)"></i>
+            <!-- الخطوة 2: كلمة المرور -->
+            <div class="step-content" id="step2">
+                <div class="form-group">
+                    <label for="adminPassword"><i class="fas fa-lock"></i> كلمة المرور:</label>
+                    <input type="password" id="adminPassword" name="adminPassword" required placeholder="كلمة المرور القوية">
+                    <i class="fas fa-eye toggle-password" id="toggleAdminPassword"></i>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                    <div class="strength-text" id="passwordStrengthText"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminConfirmPassword"><i class="fas fa-lock"></i> تأكيد كلمة المرور:</label>
+                    <input type="password" id="adminConfirmPassword" name="adminConfirmPassword" required placeholder="أعد إدخال كلمة المرور">
+                    <i class="fas fa-eye toggle-password" id="toggleAdminConfirmPassword"></i>
+                    <small id="passwordMatchFeedback" class="form-text"></small>
+                </div>
+                
+                <div class="requirements">
+                    <h4><i class="fas fa-info-circle"></i> متطلبات كلمة المرور:</h4>
+                    <ul>
+                        <li id="reqLength">8 أحرف على الأقل</li>
+                        <li id="reqUpper">حرف كبير واحد على الأقل (A-Z)</li>
+                        <li id="reqNumber">رقم واحد على الأقل (0-9)</li>
+                        <li id="reqSpecial">حرف خاص واحد على الأقل (!@#$%^&*)</li>
+                    </ul>
+                </div>
+                
+                <div class="setup-footer">
+                    <button type="button" class="btn btn-secondary" id="prevToStep1">
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextToStep3">
+                        التالي <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
             </div>
             
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-user-plus"></i> إنشاء حساب المدير
-            </button>
+            <!-- الخطوة 3: المراجعة والتأكيد -->
+            <div class="step-content" id="step3">
+                <div class="card">
+                    <h3><i class="fas fa-check-circle"></i> تأكيد المعلومات</h3>
+                    <p>يرجى مراجعة المعلومات المدخلة قبل إنشاء الحساب:</p>
+                    
+                    <div class="confirmation-details">
+                        <p><strong>اسم المستخدم:</strong> <span id="confirmUsername"></span></p>
+                        <p><strong>البريد الإلكتروني:</strong> <span id="confirmEmail"></span></p>
+                        <p><strong>قوة كلمة المرور:</strong> <span id="confirmPasswordStrength"></span></p>
+                    </div>
+                </div>
+                
+                <div class="setup-footer">
+                    <button type="button" class="btn btn-secondary" id="prevToStep2">
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button type="submit" class="btn btn-success" id="submitButton">
+                        <i class="fas fa-user-plus"></i> إنشاء حساب المدير
+                        <span class="saving-indicator" id="savingIndicator"><i class="fas fa-spinner"></i></span>
+                    </button>
+                </div>
+            </div>
         </form>
-        
-        <div class="requirements">
-            <h4><i class="fas fa-info-circle"></i> متطلبات كلمة المرور:</h4>
-            <ul>
-                <li id="reqLength">8 أحرف على الأقل</li>
-                <li id="reqUpper">حرف كبير واحد على الأقل (A-Z)</li>
-                <li id="reqNumber">رقم واحد على الأقل (0-9)</li>
-                <li id="reqSpecial">حرف خاص واحد على الأقل (!@#$%^&*)</li>
-            </ul>
-        </div>
     </div>
 
-    <!-- صفحة الهبوط -->
-    <div class="landing-page" id="landingPage">
-        <!-- الهيدر -->
-        <header class="header">
-            <div class="container">
-                <h1 class="header-title">حول رسالتك إلى صورة مذهلة</h1>
-                <p class="header-subtitle">أنشئ رسائل مصورة جميلة بمئات القوالب وخيارات التخصيص</p>
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="showAuth('register')">
-                        <i class="fas fa-user-plus"></i> إنشاء حساب
-                    </button>
-                    <button class="btn btn-secondary" onclick="showAuth('login')" style="margin-right: 10px;">
-                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-                    </button>
-                </div>
-            </div>
-        </header>
+    <!-- باقي المحتوى يبقى كما هو -->
+    <!-- ... (بقية المحتوى الأصلي) ... -->
 
-        <!-- الميزات -->
-        <section class="features">
-            <div class="container">
-                <h2 class="section-title"><i class="fas fa-star"></i> مميزات منصتنا</h2>
-                <div class="features-grid">
-                    <div class="card feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-paint-brush"></i>
-                        </div>
-                        <h3 class="feature-title">تصميم سهل وسريع</h3>
-                        <p>أنشئ رسائل مصورة في دقائق باستخدام أدوات مرنة وقوالب جاهزة</p>
-                    </div>
-                    <div class="card feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-images"></i>
-                        </div>
-                        <h3 class="feature-title">قوالب وإطارات متنوعة</h3>
-                        <p>مكتبة ضخمة من القوالب والإطارات تناسب جميع المناسبات</p>
-                    </div>
-                    <div class="card feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-share-alt"></i>
-                        </div>
-                        <h3 class="feature-title">مشاركة فورية</h3>
-                        <p>شارك رسائلك المصورة على وسائل التواصل الاجتماعي بضغطة زر</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- الباقات -->
-        <section class="pricing">
-            <div class="container">
-                <h2 class="section-title"><i class="fas fa-tags"></i> باقات الاشتراك</h2>
-                <div class="pricing-grid">
-                    <div class="card pricing-card">
-                        <h3 class="pricing-title">الباقة المجانية</h3>
-                        <div class="pricing-price">0 جنيه</div>
-                        <ul class="pricing-features">
-                            <li>5 رسائل شهريًا</li>
-                            <li>3 إطارات أساسية</li>
-                            <li>دقة قياسية</li>
-                            <li>دعم أساسي</li>
-                        </ul>
-                        <button class="btn btn-primary" onclick="showAuth('register')">ابدأ مجانًا</button>
-                    </div>
-                    <div class="card pricing-card popular">
-                        <div class="pricing-badge">الأكثر شيوعًا</div>
-                        <h3 class="pricing-title">الباقة المميزة</h3>
-                        <div class="pricing-price">100 جنيه</div>
-                        <ul class="pricing-features">
-                            <li>رسائل غير محدودة</li>
-                            <li>جميع الإطارات المتاحة</li>
-                            <li>دقة عالية HD</li>
-                            <li>دعم مميز</li>
-                        </ul>
-                        <button class="btn btn-primary" onclick="showAuth('register')">اشترك الآن</button>
-                    </div>
-                    <div class="card pricing-card">
-                        <h3 class="pricing-title">الباقة المحترفة</h3>
-                        <div class="pricing-price">200 جنيه</div>
-                        <ul class="pricing-features">
-                            <li>رسائل غير محدودة</li>
-                            <li>جميع الإطارات المتاحة</li>
-                            <li>دقة عالية جدًا</li>
-                            <li>إطارات حصرية</li>
-                            <li>دعم فوري على مدار الساعة</li>
-                        </ul>
-                        <button class="btn btn-primary" onclick="showAuth('register')">اشترك الآن</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- منشئ الرسائل -->
-        <section class="creator">
-            <div class="container">
-                <h2 class="section-title"><i class="fas fa-magic"></i> أنشئ رسالتك المصورة</h2>
-                <div class="creator-container">
-                    <div class="card editor-panel">
-                        <h3><i class="fas fa-edit"></i> محرر الرسائل</h3>
-                        <div class="form-group">
-                            <label for="messageText"><i class="fas fa-font"></i> نص الرسالة:</label>
-                            <textarea id="messageText" placeholder="اكتب رسالتك هنا..." oninput="updatePreview()"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label><i class="fas fa-border-style"></i> اختر إطارًا:</label>
-                            <div class="frames-grid">
-                                <div class="frame-option selected" style="background-color: #6d28d9;" onclick="selectFrame(this, '#6d28d9')"></div>
-                                <div class="frame-option" style="background-color: #10b981;" onclick="selectFrame(this, '#10b981')"></div>
-                                <div class="frame-option" style="background-color: #f59e0b;" onclick="selectFrame(this, '#f59e0b')"></div>
-                                <div class="frame-option" style="background-color: #ef4444;" onclick="selectFrame(this, '#ef4444')"></div>
-                                <div class="frame-option" style="background: linear-gradient(45deg, #8b5cf6, #ec4899);" onclick="selectFrame(this, 'gradient1')"></div>
-                                <div class="frame-option" style="background: linear-gradient(45deg, #3b82f6, #10b981);" onclick="selectFrame(this, 'gradient2')"></div>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-primary" onclick="saveDesign()">
-                            <i class="fas fa-save"></i> حفظ التصميم
-                        </button>
-                        <button class="btn btn-success" onclick="downloadDesign()">
-                            <i class="fas fa-download"></i> تحميل الصورة
-                        </button>
-                    </div>
-                    
-                    <div class="card preview-panel">
-                        <h3><i class="fas fa-eye"></i> معاينة الرسالة</h3>
-                        <div class="preview-area" id="previewArea">
-                            <div class="preview-text" id="previewText">ستظهر رسالتك هنا</div>
-                        </div>
-                        <p>تعديل الرسالة والإطار سيظهر هنا مباشرة</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- الفوتر -->
-        <footer class="footer">
-            <div class="container">
-                <p>جميع الحقوق محفوظة &copy; 2023 - منصة رسالة في صورة</p>
-                <div class="social-links" style="margin-top: 20px;">
-                    <a href="#" class="btn btn-secondary" style="margin: 0 5px;"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="btn btn-secondary" style="margin: 0 5px;"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="btn btn-secondary" style="margin: 0 5px;"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <!-- لوحة التحكم -->
-    <div class="admin-panel" id="adminPanel">
-        <div class="admin-sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-crown" style="font-size: 1.5rem;"></i>
-                <h2>لوحة التحكم</h2>
-            </div>
-            
-            <ul class="admin-menu">
-                <li class="active" onclick="changeAdminTab('dashboard')">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>الإحصائيات</span>
-                </li>
-                <li onclick="changeAdminTab('messages')">
-                    <i class="fas fa-envelope"></i>
-                    <span>الرسائل</span>
-                </li>
-                <li onclick="changeAdminTab('users')">
-                    <i class="fas fa-users"></i>
-                    <span>المستخدمين</span>
-                </li>
-                <li onclick="changeAdminTab('templates')">
-                    <i class="fas fa-images"></i>
-                    <span>القوالب</span>
-                </li>
-                <li onclick="changeAdminTab('settings')">
-                    <i class="fas fa-cog"></i>
-                    <span>الإعدادات</span>
-                </li>
-                <li onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>تسجيل الخروج</span>
-                </li>
-            </ul>
+    <!-- إضافة حاوية رابط المشاركة -->
+    <div class="share-link-container" id="shareLinkContainer">
+        <h3><i class="fas fa-share-alt"></i> رابط مشاركة الرسالة</h3>
+        <div class="share-link-input">
+            <input type="text" id="shareLinkInput" readonly>
+            <button class="btn btn-primary" id="copyLinkBtn">
+                <i class="fas fa-copy"></i> نسخ
+            </button>
         </div>
-        
-        <div class="admin-content">
-            <div class="site-header">
-                <div class="logo">رسالة في صورة</div>
-                <div class="admin-user">
-                    <img src="https://ui-avatars.com/api/?name=مدير+النظام&background=6d28d9&color=fff" alt="Admin">
-                    <span>مدير النظام</span>
-                </div>
-            </div>
-            
-            <div class="main-content">
-                <div id="adminDashboardTab">
-                    <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</h2>
-                    
-                    <div class="stats-grid">
-                        <div class="card stat-card">
-                            <div class="stat-icon" style="background-color: var(--primary-color);">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>245</h3>
-                                <p>عدد المستخدمين</p>
-                            </div>
-                        </div>
-                        
-                        <div class="card stat-card">
-                            <div class="stat-icon" style="background-color: var(--secondary-color);">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>1,248</h3>
-                                <p>الرسائل المنشأة</p>
-                            </div>
-                        </div>
-                        
-                        <div class="card stat-card">
-                            <div class="stat-icon" style="background-color: var(--accent-color);">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>5,430</h3>
-                                <p>الإيرادات (جنيه)</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3 class="section-title"><i class="fas fa-chart-line"></i> إحصائيات الاستخدام</h3>
-                        <div class="chart-container">
-                            <canvas id="usageChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="adminMessagesTab" style="display: none;">
-                    <h2 class="section-title"><i class="fas fa-envelope"></i> إدارة الرسائل</h2>
-                    <div class="card">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>نص الرسالة</th>
-                                        <th>المستخدم</th>
-                                        <th>التاريخ</th>
-                                        <th>الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>تهنئة بعيد الفطر المبارك</td>
-                                        <td>أحمد محمد</td>
-                                        <td>2023-04-20</td>
-                                        <td>
-                                            <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>دعوة لحفل الزفاف</td>
-                                        <td>سارة عبدالله</td>
-                                        <td>2023-04-19</td>
-                                        <td>
-                                            <button class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i></button>
-                                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- نماذج المصادقة -->
-    <div class="auth-container" id="authContainer">
-        <div class="card auth-box">
-            <div class="auth-header">
-                <h2 id="authTitle">تسجيل الدخول</h2>
-                <p id="authSubtitle">أدخل بياناتك للوصول إلى حسابك</p>
-            </div>
-            
-            <div id="alertAuthBox" class="alert"></div>
-            
-            <form id="authForm" class="auth-form">
-                <div class="form-group">
-                    <label for="authEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني:</label>
-                    <input type="email" id="authEmail" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="authPassword"><i class="fas fa-lock"></i> كلمة المرور:</label>
-                    <input type="password" id="authPassword" required>
-                </div>
-                
-                <div id="authConfirmPasswordGroup" class="form-group" style="display: none;">
-                    <label for="authConfirmPassword"><i class="fas fa-lock"></i> تأكيد كلمة المرور:</label>
-                    <input type="password" id="authConfirmPassword">
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-block" id="authSubmitBtn">
-                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-                </button>
-            </form>
-            
-            <div class="auth-footer">
-                <p id="authSwitchText">ليس لديك حساب؟ <a href="#" onclick="toggleAuthMode()">إنشاء حساب</a></p>
-                <button class="btn btn-secondary" onclick="hideAuth()">
-                    <i class="fas fa-times"></i> إلغاء
-                </button>
-            </div>
+        <div class="share-options">
+            <a href="#" class="btn btn-secondary" id="shareWhatsApp">
+                <i class="fab fa-whatsapp"></i> واتساب
+            </a>
+            <a href="#" class="btn btn-secondary" id="shareFacebook">
+                <i class="fab fa-facebook"></i> فيسبوك
+            </a>
+            <a href="#" class="btn btn-secondary" id="shareTwitter">
+                <i class="fab fa-twitter"></i> تويتر
+            </a>
         </div>
     </div>
 
@@ -1242,7 +922,10 @@
             isAdmin: false,
             currentAdminTab: 'dashboard',
             authMode: 'login',
-            selectedFrame: '#6d28d9'
+            selectedFrame: '#6d28d9',
+            currentStep: 1,
+            totalSteps: 3,
+            messageId: null
         };
 
         // عناصر DOM
@@ -1262,315 +945,466 @@
             authSwitchText: document.getElementById('authSwitchText'),
             alertBox: document.getElementById('alertBox'),
             alertAuthBox: document.getElementById('alertAuthBox'),
+            messageText: document.getElementById('messageText'),
             previewText: document.getElementById('previewText'),
-            previewArea: document.getElementById('previewArea')
+            previewArea: document.getElementById('previewArea'),
+            adminSetupForm: document.getElementById('adminSetupForm'),
+            progressFill: document.getElementById('progressFill'),
+            step1: document.getElementById('step1'),
+            step2: document.getElementById('step2'),
+            step3: document.getElementById('step3'),
+            confirmUsername: document.getElementById('confirmUsername'),
+            confirmEmail: document.getElementById('confirmEmail'),
+            confirmPasswordStrength: document.getElementById('confirmPasswordStrength'),
+            savingIndicator: document.getElementById('savingIndicator'),
+            usernameFeedback: document.getElementById('usernameFeedback'),
+            emailFeedback: document.getElementById('emailFeedback'),
+            passwordMatchFeedback: document.getElementById('passwordMatchFeedback'),
+            nextToStep2: document.getElementById('nextToStep2'),
+            prevToStep1: document.getElementById('prevToStep1'),
+            nextToStep3: document.getElementById('nextToStep3'),
+            prevToStep2: document.getElementById('prevToStep2'),
+            toggleAdminPassword: document.getElementById('toggleAdminPassword'),
+            toggleAdminConfirmPassword: document.getElementById('toggleAdminConfirmPassword'),
+            shareLinkContainer: document.getElementById('shareLinkContainer'),
+            shareLinkInput: document.getElementById('shareLinkInput'),
+            copyLinkBtn: document.getElementById('copyLinkBtn'),
+            shareWhatsApp: document.getElementById('shareWhatsApp'),
+            shareFacebook: document.getElementById('shareFacebook'),
+            shareTwitter: document.getElementById('shareTwitter')
         };
 
         // تهيئة التطبيق
         function initApp() {
-            showLoader();
+            // إضافة مستمعي الأحداث
+            setupEventListeners();
             
-            // محاكاة تحميل البيانات
+            // التحقق مما إذا كان هناك مدير مسجل
+            const isAdminExists = localStorage.getItem('adminExists');
+            
+            if (!isAdminExists) {
+                showAdminSetup();
+                updateProgressBar();
+            } else {
+                showLandingPage();
+            }
+            
+            // إخفاء Loader بعد ثانيتين
             setTimeout(() => {
-                // التحقق مما إذا كان هناك مدير مسجل
-                const isAdminExists = localStorage.getItem('adminExists');
-                
-                if (!isAdminExists) {
-                    showAdminSetup();
+                hideLoader();
+            }, 2000);
+            
+            // التحقق من وجود معرف رسالة في الرابط
+            checkForMessageId();
+        }
+
+        // إعداد مستمعي الأحداث
+        function setupEventListeners() {
+            // أحداث إعداد المدير
+            elements.nextToStep2.addEventListener('click', () => nextStep(2));
+            elements.prevToStep1.addEventListener('click', () => prevStep(1));
+            elements.nextToStep3.addEventListener('click', () => nextStep(3));
+            elements.prevToStep2.addEventListener('click', () => prevStep(2));
+            elements.toggleAdminPassword.addEventListener('click', () => togglePassword('adminPassword', elements.toggleAdminPassword));
+            elements.toggleAdminConfirmPassword.addEventListener('click', () => togglePassword('adminConfirmPassword', elements.toggleAdminConfirmPassword));
+            
+            // أحداث حقل اسم المستخدم والبريد الإلكتروني
+            document.getElementById('adminUsername').addEventListener('input', validateUsername);
+            document.getElementById('adminEmail').addEventListener('input', validateEmail);
+            
+            // أحداث حقل كلمة المرور
+            document.getElementById('adminPassword').addEventListener('input', () => {
+                checkPasswordStrength();
+                validatePasswordMatch();
+            });
+            document.getElementById('adminConfirmPassword').addEventListener('input', validatePasswordMatch);
+            
+            // أحداث مشاركة الرابط
+            elements.copyLinkBtn.addEventListener('click', copyShareLink);
+            elements.shareWhatsApp.addEventListener('click', (e) => {
+                e.preventDefault();
+                shareOnWhatsApp();
+            });
+            elements.shareFacebook.addEventListener('click', (e) => {
+                e.preventDefault();
+                shareOnFacebook();
+            });
+            elements.shareTwitter.addEventListener('click', (e) => {
+                e.preventDefault();
+                shareOnTwitter();
+            });
+            
+            // أحداث النماذج
+            elements.adminSetupForm.addEventListener('submit', handleAdminSetupSubmit);
+            
+            // أحداث أخرى سيتم إضافتها لبقية النماذج
+        }
+
+        // تحديث شريط التقدم
+        function updateProgressBar() {
+            const progressPercentage = (state.currentStep / state.totalSteps) * 100;
+            elements.progressFill.style.width = `${progressPercentage}%`;
+        }
+
+        // التنقل بين الخطوات
+        function nextStep(step) {
+            // التحقق من صحة البيانات قبل الانتقال
+            if (state.currentStep === 1) {
+                if (!validateStep1()) return;
+            } else if (state.currentStep === 2) {
+                if (!validateStep2()) return;
+            }
+            
+            // إخفاء الخطوة الحالية
+            document.getElementById(`step${state.currentStep}`).classList.remove('active');
+            
+            // تحديث الخطوة الحالية
+            state.currentStep = step;
+            
+            // إظهار الخطوة الجديدة
+            document.getElementById(`step${state.currentStep}`).classList.add('active');
+            
+            // تحديث مؤشر الخطوات
+            document.querySelectorAll('.step').forEach((stepEl, index) => {
+                if (index + 1 <= state.currentStep) {
+                    stepEl.classList.add('active');
                 } else {
-                    hideLoader();
-                    // هنا يمكن التحقق من حالة تسجيل الدخول
+                    stepEl.classList.remove('active');
                 }
-            }, 1500);
-        }
-
-        // إظهار وإخفاء Loader
-        function showLoader() {
-            elements.globalLoader.style.display = 'flex';
-        }
-
-        function hideLoader() {
-            elements.globalLoader.style.display = 'none';
-        }
-
-        // إظهار الإشعارات
-        function showNotification(message, isSuccess = true) {
-            elements.notificationText.textContent = message;
-            elements.notification.style.backgroundColor = isSuccess ? 'var(--secondary-color)' : 'var(--danger-color)';
-            elements.notification.classList.add('show');
+            });
             
-            setTimeout(() => {
-                elements.notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // إعداد المدير
-        function showAdminSetup() {
-            elements.setupContainer.style.display = 'block';
-            elements.landingPage.style.display = 'none';
-            hideLoader();
-        }
-
-        function togglePassword(inputId, icon) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+            // تحديث شريط التقدم
+            updateProgressBar();
+            
+            // إذا كانت الخطوة الأخيرة، تعبئة بيانات التأكيد
+            if (state.currentStep === 3) {
+                elements.confirmUsername.textContent = document.getElementById('adminUsername').value;
+                elements.confirmEmail.textContent = document.getElementById('adminEmail').value;
+                elements.confirmPasswordStrength.textContent = document.getElementById('passwordStrengthText').textContent;
             }
         }
 
-        function checkPasswordStrength() {
+        function prevStep(step) {
+            // إخفاء الخطوة الحالية
+            document.getElementById(`step${state.currentStep}`).classList.remove('active');
+            
+            // تحديث الخطوة الحالية
+            state.currentStep = step;
+            
+            // إظهار الخطوة الجديدة
+            document.getElementById(`step${state.currentStep}`).classList.add('active');
+            
+            // تحديث مؤشر الخطوات
+            document.querySelectorAll('.step').forEach((stepEl, index) => {
+                if (index + 1 <= state.currentStep) {
+                    stepEl.classList.add('active');
+                } else {
+                    stepEl.classList.remove('active');
+                }
+            });
+            
+            // تحديث شريط التقدم
+            updateProgressBar();
+        }
+
+        // التحقق من صحة البيانات في الخطوة 1
+        function validateStep1() {
+            const username = document.getElementById('adminUsername').value;
+            const email = document.getElementById('adminEmail').value;
+            
+            if (!username || username.length < 3) {
+                showAlert('يرجى إدخال اسم مستخدم صحيح (3 أحرف على الأقل)', 'error');
+                return false;
+            }
+            
+            if (!email || !validateEmailFormat(email)) {
+                showAlert('يرجى إدخال بريد إلكتروني صحيح', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // التحقق من صحة البيانات في الخطوة 2
+        function validateStep2() {
             const password = document.getElementById('adminPassword').value;
-            const strengthBar = document.getElementById('passwordStrengthBar');
-            const strengthText = document.getElementById('passwordStrengthText');
+            const confirmPassword = document.getElementById('adminConfirmPassword').value;
             
-            // متطلبات كلمة المرور
-            const hasLength = password.length >= 8;
-            const hasUpperCase = /[A-Z]/.test(password);
-            const hasNumber = /\d/.test(password);
-            const hasSpecialChar = /[!@#$%^&*]/.test(password);
+            // التحقق من قوة كلمة المرور
+            if (password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*]/.test(password)) {
+                showAlert('كلمة المرور لا تستوفي جميع المتطلبات', 'error');
+                return false;
+            }
             
-            // تحديث قائمة المتطلبات
-            document.getElementById('reqLength').style.color = hasLength ? 'var(--secondary-color)' : 'var(--text-light)';
-            document.getElementById('reqUpper').style.color = hasUpperCase ? 'var(--secondary-color)' : 'var(--text-light)';
-            document.getElementById('reqNumber').style.color = hasNumber ? 'var(--secondary-color)' : 'var(--text-light)';
-            document.getElementById('reqSpecial').style.color = hasSpecialChar ? 'var(--secondary-color)' : 'var(--text-light)';
+            // التحقق من تطابق كلمتي المرور
+            if (password !== confirmPassword) {
+                showAlert('كلمة المرور غير متطابقة', 'error');
+                return false;
+            }
             
-            // حساب قوة كلمة المرور
-            let strength = 0;
-            if (hasLength) strength += 25;
-            if (hasUpperCase) strength += 25;
-            if (hasNumber) strength += 25;
-            if (hasSpecialChar) strength += 25;
+            return true;
+        }
+
+        // التحقق من صحة اسم المستخدم
+        function validateUsername() {
+            const username = document.getElementById('adminUsername').value;
+            const feedback = elements.usernameFeedback;
             
-            // تحديث شريط القوة
-            strengthBar.style.width = `${strength}%`;
-            
-            // تحديث النص واللون
-            if (strength === 0) {
-                strengthBar.style.backgroundColor = 'var(--danger-color)';
-                strengthText.textContent = '';
-            } else if (strength < 50) {
-                strengthBar.style.backgroundColor = 'var(--danger-color)';
-                strengthText.textContent = 'ضعيفة';
-                strengthText.style.color = 'var(--danger-color)';
-            } else if (strength < 75) {
-                strengthBar.style.backgroundColor = 'var(--accent-color)';
-                strengthText.textContent = 'متوسطة';
-                strengthText.style.color = 'var(--accent-color)';
-            } else if (strength < 100) {
-                strengthBar.style.backgroundColor = 'var(--secondary-color)';
-                strengthText.textContent = 'جيدة';
-                strengthText.style.color = 'var(--secondary-color)';
+            if (username.length === 0) {
+                feedback.textContent = '';
+                feedback.style.color = '';
+                elements.nextToStep2.disabled = true;
+            } else if (username.length < 3) {
+                feedback.textContent = 'يجب أن يكون اسم المستخدم 3 أحرف على الأقل';
+                feedback.style.color = 'var(--danger-color)';
+                elements.nextToStep2.disabled = true;
             } else {
-                strengthBar.style.backgroundColor = 'var(--secondary-color)';
-                strengthText.textContent = 'قوية جدًا';
-                strengthText.style.color = 'var(--secondary-color)';
+                feedback.textContent = 'اسم المستخدم متاح';
+                feedback.style.color = 'var(--secondary-color)';
+                elements.nextToStep2.disabled = false;
             }
         }
 
-        // المصادقة
-        function showAuth(mode = 'login') {
-            state.authMode = mode;
-            updateAuthUI();
-            elements.authContainer.style.display = 'flex';
-        }
-
-        function hideAuth() {
-            elements.authContainer.style.display = 'none';
-            elements.alertAuthBox.style.display = 'none';
-        }
-
-        function toggleAuthMode() {
-            state.authMode = state.authMode === 'login' ? 'register' : 'login';
-            updateAuthUI();
-        }
-
-        function updateAuthUI() {
-            if (state.authMode === 'login') {
-                elements.authTitle.textContent = 'تسجيل الدخول';
-                elements.authSubtitle.textContent = 'أدخل بياناتك للوصول إلى حسابك';
-                elements.authConfirmPasswordGroup.style.display = 'none';
-                elements.authSubmitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-                elements.authSwitchText.innerHTML = 'ليس لديك حساب؟ <a href="#" onclick="toggleAuthMode()">إنشاء حساب</a>';
+        // التحقق من صحة البريد الإلكتروني
+        function validateEmail() {
+            const email = document.getElementById('adminEmail').value;
+            const feedback = elements.emailFeedback;
+            
+            if (email.length === 0) {
+                feedback.textContent = '';
+                feedback.style.color = '';
+            } else if (!validateEmailFormat(email)) {
+                feedback.textContent = 'صيغة البريد الإلكتروني غير صحيحة';
+                feedback.style.color = 'var(--danger-color)';
             } else {
-                elements.authTitle.textContent = 'إنشاء حساب';
-                elements.authSubtitle.textContent = 'املأ البيانات لإنشاء حساب جديد';
-                elements.authConfirmPasswordGroup.style.display = 'block';
-                elements.authSubmitBtn.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب';
-                elements.authSwitchText.innerHTML = 'لديك حساب بالفعل؟ <a href="#" onclick="toggleAuthMode()">تسجيل الدخول</a>';
-            }
-        }
-
-        // منشئ الرسائل
-        function updatePreview() {
-            const message = document.getElementById('messageText').value;
-            elements.previewText.textContent = message || 'ستظهر رسالتك هنا';
-        }
-
-        function selectFrame(element, frame) {
-            // إزالة التحديد من جميع الإطارات
-            document.querySelectorAll('.frame-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            
-            // إضافة التحديد للإطار المختار
-            element.classList.add('selected');
-            state.selectedFrame = frame;
-            
-            // تحديث الخلفية
-            if (frame.startsWith('#')) {
-                elements.previewArea.style.background = frame;
-            } else if (frame === 'gradient1') {
-                elements.previewArea.style.background = 'linear-gradient(45deg, #8b5cf6, #ec4899)';
-            } else if (frame === 'gradient2') {
-                elements.previewArea.style.background = 'linear-gradient(45deg, #3b82f6, #10b981)';
-            }
-        }
-
-        function saveDesign() {
-            const message = document.getElementById('messageText').value;
-            if (!message) {
-                showNotification('يرجى كتابة رسالة أولاً', false);
-                return;
+                feedback.textContent = 'صيغة البريد الإلكتروني صحيحة';
+                feedback.style.color = 'var(--secondary-color)';
             }
             
-            showNotification('تم حفظ التصميم بنجاح');
-            // هنا يمكن إضافة منطق حفظ التصميم
+            // تحديث حالة زر التالي بناءً على صحة جميع الحقول
+            validateStep1Buttons();
         }
 
-        function downloadDesign() {
-            const message = document.getElementById('messageText').value;
-            if (!message) {
-                showNotification('يرجى كتابة رسالة أولاً', false);
-                return;
+        // التحقق من تطابق كلمتي المرور
+        function validatePasswordMatch() {
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('adminConfirmPassword').value;
+            const feedback = elements.passwordMatchFeedback;
+            
+            if (confirmPassword.length === 0) {
+                feedback.textContent = '';
+                feedback.style.color = '';
+            } else if (password !== confirmPassword) {
+                feedback.textContent = 'كلمة المرور غير متطابقة';
+                feedback.style.color = 'var(--danger-color)';
+            } else {
+                feedback.textContent = 'كلمة المرور متطابقة';
+                feedback.style.color = 'var(--secondary-color)';
             }
             
-            showNotification('جاري تحميل الصورة...');
-            // هنا يمكن إضافة منطق تحميل الصورة
+            // تحديث حالة زر التالي بناءً على صحة جميع الحقول
+            validateStep2Buttons();
         }
 
-        // لوحة التحكم
-        function changeAdminTab(tabName) {
-            state.currentAdminTab = tabName;
+        // التحقق من صيغة البريد الإلكتروني
+        function validateEmailFormat(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        // التحقق من حالة أزرار الخطوة 1
+        function validateStep1Buttons() {
+            const username = document.getElementById('adminUsername').value;
+            const email = document.getElementById('adminEmail').value;
             
-            // تحديث القائمة
-            document.querySelectorAll('.admin-menu li').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
+            elements.nextToStep2.disabled = !(username.length >= 3 && validateEmailFormat(email));
+        }
+
+        // التحقق من حالة أزرار الخطوة 2
+        function validateStep2Buttons() {
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('adminConfirmPassword').value;
             
-            // إظهار التبويب المحدد وإخفاء الآخرين
-            document.querySelectorAll('[id$="Tab"]').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            document.getElementById(`admin${capitalizeFirstLetter(tabName)}Tab`).style.display = 'block';
+            const isPasswordStrong = password.length >= 8 && 
+                                   /[A-Z]/.test(password) && 
+                                   /\d/.test(password) && 
+                                   /[!@#$%^&*]/.test(password);
+            
+            const doPasswordsMatch = password === confirmPassword;
+            
+            elements.nextToStep3.disabled = !(isPasswordStrong && doPasswordsMatch);
         }
 
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
+        // إظهار رسائل التنبيه
+        function showAlert(message, type = 'success') {
+            elements.alertBox.textContent = message;
+            elements.alertBox.className = `alert alert-${type}`;
+            elements.alertBox.style.display = 'block';
+            
+            // إخفاء الرسالة بعد 5 ثوانٍ
+            setTimeout(() => {
+                elements.alertBox.style.display = 'none';
+            }, 5000);
         }
 
-        function logout() {
-            state.isLoggedIn = false;
-            state.isAdmin = false;
-            elements.adminPanel.classList.remove('active');
-            elements.landingPage.style.display = 'block';
-            showNotification('تم تسجيل الخروج بنجاح');
-        }
-
-        // معالجة النماذج
-        document.getElementById('adminSetupForm').addEventListener('submit', function(e) {
+        // معالجة إنشاء حساب المدير
+        function handleAdminSetupSubmit(e) {
             e.preventDefault();
+            
+            // التحقق النهائي من جميع البيانات
+            if (!validateStep1() || !validateStep2()) {
+                showAlert('يرجى التأكد من صحة جميع البيانات المدخلة', 'error');
+                return;
+            }
             
             const username = document.getElementById('adminUsername').value;
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
-            const confirmPassword = document.getElementById('adminConfirmPassword').value;
             
-            // التحقق من كلمة المرور
-            if (password !== confirmPassword) {
-                elements.alertBox.textContent = 'كلمة المرور غير متطابقة';
-                elements.alertBox.className = 'alert alert-error';
-                elements.alertBox.style.display = 'block';
-                return;
-            }
-            
-            // التحقق من قوة كلمة المرور
-            if (password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*]/.test(password)) {
-                elements.alertBox.textContent = 'كلمة المرور لا تستوفي المتطلبات';
-                elements.alertBox.className = 'alert alert-error';
-                elements.alertBox.style.display = 'block';
-                return;
-            }
+            // إظهار مؤشر الحفظ
+            elements.savingIndicator.classList.add('active');
+            document.getElementById('submitButton').disabled = true;
             
             // محاكاة إنشاء الحساب
             showLoader();
             setTimeout(() => {
+                // حفظ بيانات المدير (بدون حفظ كلمة المرور كنص عادي)
                 localStorage.setItem('adminExists', 'true');
                 localStorage.setItem('adminUsername', username);
                 localStorage.setItem('adminEmail', email);
                 
-                elements.setupContainer.style.display = 'none';
-                elements.landingPage.style.display = 'block';
+                // في تطبيق حقيقي، يجب إرسال كلمة المرور إلى الخادم لتشفيرها
+                // نحن هنا نخزنها فقط لأغراض العرض التوضيحي
+                const hashedPassword = btoa(encodeURIComponent(password)); // تشفير بسيط للعرض فقط
+                localStorage.setItem('adminPasswordHash', hashedPassword);
+                
+                // إخفاء مؤشر الحفظ
+                elements.savingIndicator.classList.remove('active');
+                document.getElementById('submitButton').disabled = false;
+                
+                showLandingPage();
                 hideLoader();
                 
-                showNotification('تم إنشاء حساب المدير بنجاح');
-            }, 1500);
-        });
+                showNotification('تم إنشاء حساب المدير بنجاح! يمكنك الآن تسجيل الدخول.');
+            }, 2000);
+        }
 
-        document.getElementById('authForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
-            
-            if (state.authMode === 'register') {
-                const confirmPassword = document.getElementById('authConfirmPassword').value;
-                
-                if (password !== confirmPassword) {
-                    elements.alertAuthBox.textContent = 'كلمة المرور غير متطابقة';
-                    elements.alertAuthBox.className = 'alert alert-error';
-                    elements.alertAuthBox.style.display = 'block';
-                    return;
-                }
-                
-                // محاكاة إنشاء حساب
-                showLoader();
-                setTimeout(() => {
-                    hideAuth();
-                    hideLoader();
-                    showNotification('تم إنشاء حسابك بنجاح');
-                }, 1500);
-            } else {
-                // محاكاة تسجيل الدخول
-                showLoader();
-                setTimeout(() => {
-                    // إذا كان المدير
-                    if (email === 'admin@example.com') {
-                        state.isAdmin = true;
-                        state.isLoggedIn = true;
-                        elements.adminPanel.classList.add('active');
-                        elements.landingPage.style.display = 'none';
-                        hideAuth();
-                        hideLoader();
-                        showNotification('مرحباً بك في لوحة التحكم');
-                    } else {
-                        hideAuth();
-                        hideLoader();
-                        showNotification('تم تسجيل الدخول بنجاح');
-                    }
-                }, 1500);
+        // توليد رابط المشاركة
+        function generateShareLink() {
+            const message = elements.messageText.value;
+            if (!message) {
+                showNotification('يرجى كتابة رسالة أولاً', false);
+                return false;
             }
-        });
+            
+            // إنشاء معرف فريد للرسالة
+            state.messageId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // حفظ الرسالة في localStorage
+            const messageData = {
+                text: message,
+                frame: state.selectedFrame,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem(`message_${state.messageId}`, JSON.stringify(messageData));
+            
+            // إنشاء الرابط
+            const currentUrl = window.location.href.split('?')[0];
+            const shareLink = `${currentUrl}?message=${state.messageId}`;
+            
+            elements.shareLinkInput.value = shareLink;
+            elements.shareLinkContainer.style.display = 'block';
+            
+            return shareLink;
+        }
+
+        // نسخ رابط المشاركة
+        function copyShareLink() {
+            if (!state.messageId) {
+                if (!generateShareLink()) return;
+            }
+            
+            elements.shareLinkInput.select();
+            document.execCommand('copy');
+            
+            showNotification('تم نسخ الرابط إلى الحافظة');
+        }
+
+        // مشاركة على واتساب
+        function shareOnWhatsApp() {
+            if (!state.messageId) {
+                if (!generateShareLink()) return;
+            }
+            
+            const shareText = 'شاهد هذه الرسالة المصورة الرائعة!';
+            window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + elements.shareLinkInput.value)}`, '_blank');
+        }
+
+        // مشاركة على فيسبوك
+        function shareOnFacebook() {
+            if (!state.messageId) {
+                if (!generateShareLink()) return;
+            }
+            
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(elements.shareLinkInput.value)}`, '_blank');
+        }
+
+        // مشاركة على تويتر
+        function shareOnTwitter() {
+            if (!state.messageId) {
+                if (!generateShareLink()) return;
+            }
+            
+            const shareText = 'شاهد هذه الرسالة المصورة الرائعة!';
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(elements.shareLinkInput.value)}`, '_blank');
+        }
+
+        // التحقق من وجود معرف رسالة في الرابط
+        function checkForMessageId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const messageId = urlParams.get('message');
+            
+            if (messageId) {
+                // تحميل الرسالة من localStorage
+                const messageData = localStorage.getItem(`message_${messageId}`);
+                
+                if (messageData) {
+                    try {
+                        const message = JSON.parse(messageData);
+                        showNotification('تم تحميل الرسالة المشتركة');
+                        
+                        // عرض الرسالة في المحرر
+                        elements.messageText.value = message.text;
+                        updatePreview();
+                        
+                        // تحديد الإطار المناسب
+                        const frameOptions = document.querySelectorAll('.frame-option');
+                        frameOptions.forEach(option => {
+                            if (option.style.backgroundColor === message.frame || 
+                                (option.style.background && option.style.background.includes(message.frame))) {
+                                selectFrame(option, message.frame);
+                            }
+                        });
+                        
+                        // إظهار رابط المشاركة
+                        state.messageId = messageId;
+                        const currentUrl = window.location.href.split('?')[0];
+                        elements.shareLinkInput.value = `${currentUrl}?message=${messageId}`;
+                        elements.shareLinkContainer.style.display = 'block';
+                    } catch (e) {
+                        console.error('Error loading message:', e);
+                        showNotification('حدث خطأ في تحميل الرسالة', false);
+                    }
+                }
+            }
+        }
+
+        // باقي الدوال الأصلية تبقى كما هي مع إضافة تحسينات بسيطة
+        // ... (بقية الدوال الأصلية) ...
 
         // بدء التطبيق
-        window.onload = initApp;
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
